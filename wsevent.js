@@ -12,6 +12,10 @@ class WSEvent {
         this._link = link;
         this._start = start;
         this._finish = finish;
+
+        if(this._finish <= this._start) {
+            throw new Error('Finish <= start');
+        }
     }
 
     get name() {
