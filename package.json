@@ -1,0 +1,29 @@
+{
+  "name": "web-standards-ru-calendar-telegram",
+  "version": "0.0.1",
+  "description": "Module for post events from web-standards-ru/calendar",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmitriym09/web-standards-ru-calendar-telegram.git"
+  },
+  "author": "dmitriym09",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dmitriym09/web-standards-ru-calendar-telegram/issues"
+  },
+  "homepage": "https://github.com/dmitriym09/web-standards-ru-calendar-telegram#readme",
+  "devDependencies": {
+    "mocha": "^6.0.2"
+  },
+  "dependencies": {
+    "moment": "^2.24.0",
+    "yaml": "^1.4.0"
+  }
+}
