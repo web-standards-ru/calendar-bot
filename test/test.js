@@ -10,6 +10,7 @@ const moment = require('moment');
 const DATE_FORMAT = 'DDMMYYYYHHmm';
 
 const WSEvent = require('../wsevent.js');
+const { sendEvent } = require('../tlgrm.js');
 
 const assert = require('assert');
 
@@ -109,4 +110,26 @@ describe('WSEvent', () => {
           });
       }
   });
+});
+
+describe('sendEvent()', () => {
+    const files = fs.readdirSync(eventsDir).filter((file) => { return /\.ya?ml$/.test(file.toLowerCase()); });
+        
+    for(const file of files) {
+        it(file, (done) => {
+            const data = fs.readFileSync(path.join(eventsDir, file), 'utf-8');
+              
+            const event = WSEvent.fromYaml(data);
+
+            sendEvent(event, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
+              .then((res) => {
+                  assert.equal(res.status, 200);
+                  done();
+              })
+              .catch((err) => {
+                  console.warn(err);
+                  done(err);
+              });
+        }).timeout(60000);
+    }
 });
