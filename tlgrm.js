@@ -7,6 +7,15 @@ const SocksProxyAgent = require('socks-proxy-agent');
 
 const WSEvent = require('./wsevent.js');
 
+/**
+ * Отправка события в телеграм канал
+ * @param {WSEvent} event событие
+ * @param {string} token токен бота
+ * @param {string} channel идентификатор канал
+ * @param {string} [proxy=null] url прокси
+ * @param {requestCallback} [stringifyMsg=null] конвертация события в строку, которая будет отправлена в канал
+ * @returns {Promise} результат http запроса {status: number, body: string}
+ */
 const sendEvent = (event, token, channel, proxy=null, stringifyMsg=null) => {
     return new Promise((resolve, reject) => {
         if(!(event instanceof WSEvent)) {

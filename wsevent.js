@@ -5,7 +5,19 @@ const moment = require('moment');
 
 const DATE_FORMAT = 'DDMMYYYYHHmm';
 
+/**
+ * Класс, описывающий событие
+ */
 class WSEvent {
+    /**
+     * Конструктор WSEvent
+     * @constructor
+     * @param {string} name название события
+     * @param {string} city город события
+     * @param {string} link url на сайт о событии
+     * @param {date} start начало события
+     * @param {date} finish окончание события
+     */
     constructor(name, city, link, start, finish) {
         this._name = name;
         this._city = city;
@@ -18,26 +30,52 @@ class WSEvent {
         }
     }
 
+    /**
+     * Название события
+     * @returns {string} название события
+     */
     get name() {
         return this._name;
     }
 
+    /**
+     * Город события
+     * @returns {string} город события
+     */
     get city() {
         return this._city;
     }
 
+    /**
+     * Url на сайт о событии
+     * @returns {string} url на сайт о событии
+     */
     get link() {
         return this._link;
     }
 
+    /**
+     * Начало события
+     * @returns {date} начало события
+     */
     get start() {
         return this._start;
     }
 
+    /**
+     * Окончание события
+     * @returns {date} окончание события
+     */
     get finish() {
         return this._finish;
     }
 
+    /**
+     * Создание WSEvent из yaml-строки
+     * @static
+     * @param {string} yaml yaml строка с событием
+     * @returns {WSEvent} новое событие
+     */
     static fromYaml(yaml) {
         const yaml_data = YAML.parse(yaml);
         
@@ -77,8 +115,8 @@ class WSEvent {
             timeSplit[1] = `${timeSecond[0]}${timeSecond[1]}`;
         }
 
-        let start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
-        let finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
+        const start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
+        const finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
 
         return new WSEvent(yaml_data.name, yaml_data.city, yaml_data.link, start, finish);
     }

@@ -1,6 +1,12 @@
 # web-standards-ru-calendar-telegram
 Telegram bot for web-standards-ru-calendar
 
+## Instaling
+
+```bash
+npm i -S web-standards-ru-calendar-telegram
+```
+
 ## Usage
 
 ```javascript
