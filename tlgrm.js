@@ -32,7 +32,7 @@ const sendEvent = (event, token, channel, proxy=null, stringifyMsg=null) => {
 
         const msg = encodeURIComponent(typeof stringifyMsg == 'function' 
             ? stringifyMsg(event) 
-                : `${event.name}\n\n${moment(event.start).format("DD.MM.YYYY")}\n${event.city}\n${event.link}`);
+                : `${event.name}\n\n${moment(event.start).utc().format("DD.MM.YYYY")}\n${event.city}\n${event.link}`);
         const endpoint = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${channel}&text=${msg}`;
         const opts = url.parse(endpoint);
 

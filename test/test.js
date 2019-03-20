@@ -28,7 +28,7 @@ describe('WSEvent', () => {
   //download events yaml from github 
   before( function(done){
     const file = fs.createWriteStream(fileEvents);
-    const request = https.get(urlEvents, (response) => {
+    https.get(urlEvents, (response) => {
       response.pipe(file);
       file.on('finish', function() {
         file.close(() => {
@@ -38,7 +38,9 @@ describe('WSEvent', () => {
           });
         });
       });
-    });
+    }).on('error', (err) => {
+        console.error(err);
+    })
   });
 
   describe('#fromYaml()', () => {
@@ -99,6 +101,7 @@ describe('WSEvent', () => {
               console.log(yaml_data.date, yaml_data.time)
               console.log(start, `${dateSplit[0]} ${timeSplit[0] || '0000'}`);
               console.log(finish, `${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`);
+              console.log(`${event.name}\n\n${moment(event.start).utc().format("DD.MM.YYYY")}\n${event.city}\n${event.link}`);
   
               assert.equal(event instanceof WSEvent, true);
               assert.equal(event.name, yaml_data.name);
