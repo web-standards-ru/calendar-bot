@@ -11,7 +11,8 @@ const DATE_FORMAT = 'DDMMYYYYHHmm';
 
 const WSEvent = require('../wsevent.js');
 const {
-    sendEvent
+    sendEvent,
+    deleteMessage
 } = require('../tlgrm.js');
 
 const assert = require('assert');
@@ -20,7 +21,21 @@ const testDir = path.join(__dirname, 'events');
 
 const urlEvents = 'https://codeload.github.com/web-standards-ru/calendar/zip/master';
 
-const eventsDir = path.join(testDir, 'calendar-master/events')
+const eventsDir = path.join(testDir, 'calendar-master/events');
+
+function* generatorMsgs(msgs) {
+    let pos = 0;
+
+    const keys = Object.keys(msgs);
+
+    while (pos < keys.length) {
+        const key = parseInt(keys[pos++]);
+        yield {
+            msgId: key,
+            msg: msgs[key]
+        };
+    }
+};
 
 describe('WSEvent', () => {
     describe('#fromYaml()', () => {
@@ -119,6 +134,8 @@ describe('WSEvent', () => {
         }
     });
 
+    const msgs = {};
+
     describe('sendEvent()', () => {
         const files = fs.readdirSync(eventsDir).filter((file) => {
             return /\.ya?ml$/.test(file.toLowerCase());
@@ -132,7 +149,14 @@ describe('WSEvent', () => {
 
                 sendEvent(event, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
                     .then((res) => {
-                        assert.equal(res.status, 200);
+                        const body = JSON.parse(res.body);
+                        if (res.status != 200 || !body.ok) {
+                            return data(body);
+                        }
+                        msgs[body.result.message_id] = {
+                            text: body.text
+                        };
+
                         done();
                     })
                     .catch((err) => {
@@ -141,5 +165,34 @@ describe('WSEvent', () => {
                     });
             }).timeout(60000);
         }
+    });
+
+    describe('deleteMessage()', () => {
+        it('Delete', (done) => {
+            const gen = generatorMsgs(msgs);
+            const _ = () => {
+                const next = gen.next();
+                if (next.done) {
+                    return done();
+                }
+
+                console.log('Rm', next.value.msgId);
+
+                deleteMessage(next.value.msgId, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
+                    .then((res) => {
+                        const body = JSON.parse(res.body);
+                        if (res.status != 200 || !body.ok) {
+                            return data(body);
+                        }
+                        _();
+                    })
+                    .catch((err) => {
+                        console.warn(err);
+                        done(err);
+                    });
+            };
+
+            _();
+        }).timeout(-1);
     });
 });
