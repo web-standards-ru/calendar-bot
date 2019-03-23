@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/dmitriym09/web-standards-ru-calendar-telegram#readme",
   "devDependencies": {
+    "fs-extra": "^7.0.1",
     "mocha": "^6.0.2",
     "unzip": "^0.1.11"
   },
