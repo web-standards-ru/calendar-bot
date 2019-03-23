@@ -46,4 +46,6 @@ TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
 
 ## Versions
 
-- *0.0.1*
+- **0.0.1**
+- **0.0.2**:
+    - fix date to utc
