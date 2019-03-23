@@ -1,4 +1,4 @@
-# web-standards-ru-calendar-telegram
+calendar-bot
 Telegram bot for web-standards-ru-calendar
 
 ## Instaling
