@@ -49,3 +49,8 @@ TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
 - **0.0.1**
 - **0.0.2**:
     - fix date to utc
+- **0.0.3**:
+    - add deleteMessage()
+- **0.0.4**:
+    - add standalone script
+
