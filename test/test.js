@@ -39,7 +39,7 @@ function* generatorMsgs(msgs) {
 
 describe('WSEvent', () => {
     describe('#fromYaml()', () => {
-        before((done) => {
+        it('Unload master', (done) => {
             if (fs.existsSync(testDir)) {
                 fs.removeSync(testDir);
             }
@@ -151,7 +151,7 @@ describe('WSEvent', () => {
                     .then((res) => {
                         const body = JSON.parse(res.body);
                         if (res.status != 200 || !body.ok) {
-                            return data(body);
+                            return done(body);
                         }
                         msgs[body.result.message_id] = {
                             text: body.text

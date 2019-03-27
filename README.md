@@ -20,7 +20,8 @@ city: Москва
 link: https://events.yandex.ru/events/yasubbotnik/10-dec-2016/
 `, 'token', 'channel', 'proxy', (event) => {
     //this is a default value when this function is not set
-    return `${event.name}\n\n${moment(event.start).utc().format("DD.MM.YYYY")}\n${event.city}\n${event.link}`;
+    moment.locale('ru');
+    return `[${event.name}](${event.link})\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`);
 })
     .then((res) => {
         const { status, body } = res;

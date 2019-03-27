@@ -14,9 +14,11 @@ const WSEvent = require('./wsevent.js');
  * @param {string} channel идентификатор канала
  * @param {string} [proxy=null] url прокси
  * @param {requestCallback} [stringifyMsg=null] конвертация события в строку, которая будет отправлена в канал
+ * @param {boolean} [disable_web_page_preview=true] disable_web_page_preview / отключение сниппетов
+ * @param {string} [proxy='markdown'] parse_mode тип сообщения
  * @returns {Promise} результат http запроса {status: number, body: string}
  */
-const sendEvent = (event, token, channel, proxy = null, stringifyMsg = null) => {
+const sendEvent = (event, token, channel, proxy=null, stringifyMsg=null, disable_web_page_preview=true, parse_mode='markdown') => {
     return new Promise((resolve, reject) => {
         if (!(event instanceof WSEvent)) {
             return reject(TypeError('event must be WSEvent'))
@@ -30,10 +32,11 @@ const sendEvent = (event, token, channel, proxy = null, stringifyMsg = null) => 
             return reject(TypeError('bot channel not set'))
         }
 
+        moment.locale('ru');
         const msg = encodeURIComponent(typeof stringifyMsg == 'function' ?
             stringifyMsg(event) :
-            `${event.name}\n\n${moment(event.start).utc().format("DD.MM.YYYY")}\n${event.city}\n${event.link}`);
-        const endpoint = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${channel}&text=${msg}`;
+            `[${event.name}](${event.link})\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`);
+        const endpoint = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${channel}&text=${msg}&parse_mode=${parse_mode}&disable_web_page_preview=${disable_web_page_preview ? 'True' : 'False'}`;
         const opts = url.parse(endpoint);
 
         if (!!proxy) {
