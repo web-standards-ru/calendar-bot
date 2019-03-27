@@ -55,7 +55,8 @@ function* generatorEvents(events) {
 }
 
 const formatEvent = (event) => {
-    return `${event.name}\n\n${moment(event.start).utc().format("DD.MM.YYYY")}\n${event.city}\n${event.link}`;
+    moment.locale('ru');
+    return `[${event.name}](${event.link})\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`;
 };
 
 download()
