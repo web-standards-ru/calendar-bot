@@ -35,7 +35,7 @@ const sendEvent = (event, token, channel, proxy=null, stringifyMsg=null, disable
         moment.locale('ru');
         const msg = encodeURIComponent(typeof stringifyMsg == 'function' ?
             stringifyMsg(event) :
-            `[${event.name}](${event.link})\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`);
+            `[${event.name}](${event.link})\n${event.city}, ${moment(event.start).utc().format('D MMMM YYYY')}`);
         const endpoint = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${channel}&text=${msg}&parse_mode=${parse_mode}&disable_web_page_preview=${disable_web_page_preview ? 'True' : 'False'}`;
         const opts = url.parse(endpoint);
 
