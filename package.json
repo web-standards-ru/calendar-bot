@@ -1,6 +1,6 @@
 {
-  "name": "web-standards-ru-calendar-telegram",
-  "version": "0.0.4",
+  "name": "@web-standards-ru/calendar-bot",
+  "version": "1.0.0",
   "description": "Module for post events from web-standards-ru/calendar",
   "main": "index.js",
   "directories": {
