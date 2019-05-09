@@ -4,9 +4,11 @@ const fs = require('fs');
 
 const argv = require('yargs').argv;
 
-const sendEvent = require('.');
+const {sendEvent} = require('./tlgrm');
 
-sendEvent(fs.readFileSync(argv.file, 'utf-8'), argv.token, argv.channel, argv.proxy)
+const WSEvent = require('./wsevent');
+
+sendEvent(WSEvent.fromYaml(fs.readFileSync(argv.file, 'utf-8')), argv.token, argv.channel, argv.proxy)
     .then((res) => {
         if(res.code != 200) {
             console.error(res);
@@ -20,5 +22,3 @@ sendEvent(fs.readFileSync(argv.file, 'utf-8'), argv.token, argv.channel, argv.pr
         console.error(err);
         process.exit(1);
     });
-
-console.log(argv);
