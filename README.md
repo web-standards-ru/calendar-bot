@@ -41,6 +41,11 @@ link: https://events.yandex.ru/events/yasubbotnik/10-dec-2016/
 npx . --file=events/2016-11-24-moscowjs.yml --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050
 ```
 
+Without install
+```bash
+npx -p @web-standards-ru/calendar-bot -c 'npx . --file=events/2016-11-24-moscowjs.yml --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050'
+```
+
 Args:
 
 - file - path fot yaml event file
@@ -71,4 +76,10 @@ TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
     - add deleteMessage()
 - **0.0.4**:
     - add standalone script
+- **1.0.0**:
+    - add cli
+- **1.0.1**:
+    - cli as default
+- **1.0.2**:
+    - upd README
 
