@@ -27,6 +27,7 @@
   "dependencies": {
     "moment": "^2.24.0",
     "socks-proxy-agent": "^4.0.2",
-    "yaml": "^1.4.0"
+    "yaml": "^1.4.0",
+    "yargs": "^13.2.2"
   }
 }

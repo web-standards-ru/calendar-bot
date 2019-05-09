@@ -9,6 +9,7 @@ npm i -S web-standards-ru-calendar-telegram
 
 ## Usage
 
+### In script
 ```javascript
 const moment = require('moment');
 
@@ -33,6 +34,19 @@ link: https://events.yandex.ru/events/yasubbotnik/10-dec-2016/
 
 ```
 
+### As cli
+
+```bash
+node send.js --file=events/2016-11-24-moscowjs.yml --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050
+```
+
+Args:
+- file - path fot yaml event file
+- token - bots token
+- channel - channel name
+- proxy - url for proxy (for example Telegram blocker in you country), not necessarily
+Returning code is 0 for successed.
+"use strict";
 ## Tests
 
 For test run
