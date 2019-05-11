@@ -19,7 +19,7 @@
     "url": "https://github.com/dmitriym09/web-standards-ru-calendar-telegram/issues"
   },
   "bin": {
-    "calendar-bot": "index.js",
+    "calendar-bot": "./send.js",
   },
   "homepage": "https://github.com/dmitriym09/web-standards-ru-calendar-telegram#readme",
   "devDependencies": {
