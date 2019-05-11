@@ -19,7 +19,7 @@
     "url": "https://github.com/web-standards-ru/calendar-bot/issues"
   },
   "bin": {
-    "calendar-bot": "./send.js",
+    "calendar-bot": "./send.js"
   },
   "homepage": "https://github.com/web-standards-ru/calendar-bot#readme",
   "devDependencies": {
