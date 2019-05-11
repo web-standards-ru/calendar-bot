@@ -14,7 +14,7 @@ npm i -S @web-standards-ru/calendar-bot
 const moment = require('moment');
 
 const sendToChannel = require('@web-standards-ru/calendar-bot/tlgrm.js');
-const WSEvent = require('@web-standards-ru/calendar-bot//wsevent.js');
+const WSEvent = require('@web-standards-ru/calendar-bot/wsevent.js');
 
 sendToChannel(WSEvent.fromYaml(`name: Яндекс Субботник
 date: 10.12.2016
@@ -38,22 +38,28 @@ link: https://events.yandex.ru/events/yasubbotnik/10-dec-2016/
 ### As cli
 
 ```bash
-npx . --file=events/2016-11-24-moscowjs.yml --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050
+node . --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050 events/2016-11-24-moscowjs1.yml events/2016-11-24-moscowjs2.yml
 ```
 
 Without install
 ```bash
-npx -p @web-standards-ru/calendar-bot -c 'npx . --file=events/2016-11-24-moscowjs.yml --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050'
+npx github:web-standards-ru/calendar-bot --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050 events/2016-11-24-moscowjs1.yml events/2016-11-24-moscowjs2.yml
 ```
 
 Args:
 
-- file - path fot yaml event file
 - token - bots token
 - channel - channel name
 - proxy - url for proxy (for example Telegram blocker in you country), not necessarily
-Returning code is 0 for successed.
-"use strict";
+- all last args - paths for yaml event files
+
+Returning code:
+
+- 0 - successed
+- 1 - sending exception
+- 2 - not 200 http response code
+- 255 - not set files
+
 
 ## Tests
 
@@ -82,4 +88,8 @@ TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
     - cli as default
 - **1.0.2**:
     - upd README
+- **1.0.3**:
+    - add bin in package
+- **1.0.4**:
+    - multi-send files
 
