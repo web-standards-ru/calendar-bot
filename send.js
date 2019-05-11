@@ -12,7 +12,7 @@ const WSEvent = require('./wsevent');
 
 sendEvent(WSEvent.fromYaml(fs.readFileSync(argv.file, 'utf-8')), argv.token, argv.channel, argv.proxy)
     .then((res) => {
-        if(res.code != 200) {
+        if(res.status != 200) {
             console.error(res);
             return process.exit(2);
         }
