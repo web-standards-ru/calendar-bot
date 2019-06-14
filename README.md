@@ -42,6 +42,7 @@ node . --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050 events/20
 ```
 
 Without install
+
 ```bash
 npx github:web-standards-ru/calendar-bot --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050 events/2016-11-24-moscowjs1.yml events/2016-11-24-moscowjs2.yml
 ```
@@ -58,8 +59,6 @@ Returning code:
 - 0 - successed
 - 1 - sending exception
 - 2 - not 200 http response code
-- 255 - not set files
-
 
 ## Tests
 
@@ -92,4 +91,6 @@ TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
     - add bin in package
 - **1.0.4**:
     - multi-send files
+- **1.0.5**:
+    - return 0 if events is empty
 

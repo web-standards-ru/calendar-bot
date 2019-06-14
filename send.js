@@ -17,7 +17,8 @@ const events = argv._.map((file) => {
 });
 
 if (events.length == 0) {
-    process.exit(255);
+    console.error('Events is empty!');
+    process.exit(0);
 }
 
 Promise.all(events)
