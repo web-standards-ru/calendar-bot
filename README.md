@@ -1,15 +1,17 @@
-calendar-bot
-Telegram bot for web-standards-ru-calendar
+# Бот для календаря событий
 
-## Instaling
+Публикует свежие события [из календаря](https://github.com/web-standards-ru/calendar) в чат [@webstandards_events](https://t.me/webstandards_events) в Телеграме.
+
+## Установка
 
 ```bash
-npm i -S @web-standards-ru/calendar-bot
+npm install --save @web-standards-ru/calendar-bot
 ```
 
-## Usage
+## Использование
 
-### In script
+### В скрипте
+
 ```javascript
 const moment = require('moment');
 
@@ -35,44 +37,44 @@ link: https://events.yandex.ru/events/yasubbotnik/10-dec-2016/
 
 ```
 
-### As cli
+### В командной строке
 
 ```bash
 node . --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050 events/2016-11-24-moscowjs1.yml events/2016-11-24-moscowjs2.yml
 ```
 
-Without install
+Без установки
 
 ```bash
 npx github:web-standards-ru/calendar-bot --token=111 --channel=@wsdc_test --proxy=socks://127.0.0.1:9050 events/2016-11-24-moscowjs1.yml events/2016-11-24-moscowjs2.yml
 ```
 
-Args:
+Аргументы:
 
-- token - bots token
-- channel - channel name
-- proxy - url for proxy (for example Telegram blocker in you country), not necessarily
-- all last args - paths for yaml event files
+- `token` — токены бота
+- `channel` — имя канала
+- `proxy` — адрес прокси (если Телеграм заблокирован, опционально)
+- все последние аргументы — пути к YAML-файлам событий
 
-Returning code:
+Коды ответов:
 
-- 0 - successed
-- 1 - sending exception
-- 2 - not 200 http response code
+- `0` — успешно
+- `1` — неуспешно
+- `2` — HTTP-ответ не 200
 
-## Tests
+## Тесты
 
-For test run
+Для запуска тестов:
 
 ```javascript
 TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
 ```
 
-- *TOKEN* - token telegrams bost
-- *CHANNEL* - channel name, for e.g. @test_channel (telegram bot must be a an administrator)
-- *PROXY* - proxy url, for e.g. socks://127.0.0.1:9050 for a local tor daemon
+- `TOKEN` — токен бота в Телеграме
+- `CHANNEL` — имя канала, например `@test_channel` (бот должен быть админом)
+- `PROXY` — адрес прокси, например `socks://127.0.0.1:9050` для локального демона
 
-## Versions
+## История версий
 
 - **0.0.1**
 - **0.0.2**:
@@ -93,4 +95,3 @@ TOKEN='{bot_token}' CHANNEL='@{channel_name}' PROXY='{proxy_url}' npm run test
     - multi-send files
 - **1.0.5**:
     - return 0 if events is empty
-
