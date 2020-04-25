@@ -109,11 +109,12 @@ describe('WSEvent', () => {
             throw new Error('Not set env CHANNEL');
         }
 
-        for (const fileName in this.eventFiles) {
-            const data = this.eventFiles[fileName];
+        const eventsToSend = Object.keys(this.eventFiles)
+            .map(fileName => WSEvent.fromYaml(this.eventFiles[fileName]))
+            .sort((le, re) => re.start.valueOf() - le.start.valueOf())
+            .slice(0, 10);
 
-            const event = WSEvent.fromYaml(data);
-
+        for (const event of eventsToSend) {
             const response = await sendEvent(event, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
 
             const body = JSON.parse(response.body);
@@ -127,7 +128,7 @@ describe('WSEvent', () => {
 
     it('deleteMessage()', async function () {
         for (const msgId in this.msgs) {
-            const response = await deleteMessage(msgId, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
+            const response = await deleteMessage(parseInt(msgId), process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
 
             const body = JSON.parse(response.body);
             assert.equal(response.status, 200);
