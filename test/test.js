@@ -1,10 +1,10 @@
 "use strict";
 
-const fs = require('fs-extra');
 const path = require('path');
-const YAML = require('yaml');
-const unzip = require('unzip');
 const https = require('https');
+
+const unzipper = require('unzipper');
+const YAML = require('yaml');
 const moment = require('moment');
 
 const DATE_FORMAT = 'DDMMYYYYHHmm';
@@ -17,182 +17,122 @@ const {
 
 const assert = require('assert');
 
-const testDir = path.join(__dirname, 'events');
-
-const urlEvents = 'https://codeload.github.com/web-standards-ru/calendar/zip/master';
-
-const eventsDir = path.join(testDir, 'calendar-master/events');
-
-function* generatorMsgs(msgs) {
-    let pos = 0;
-
-    const keys = Object.keys(msgs);
-
-    while (pos < keys.length) {
-        const key = parseInt(keys[pos++]);
-        yield {
-            msgId: key,
-            msg: msgs[key]
-        };
-    }
-};
+const URL_EVENTS = 'https://codeload.github.com/web-standards-ru/calendar/zip/master';
 
 describe('WSEvent', () => {
-    describe('#fromYaml()', () => {
-        it('Unload master', (done) => {
-            if (fs.existsSync(testDir)) {
-                fs.removeSync(testDir);
+    before(function (done) {
+        this.timeout(60000);
+        this.eventFiles = {};
+        this.msgs = {};
+
+        https.get(URL_EVENTS, response => {
+            response.pipe(unzipper.Parse())
+                .on('entry', entry => {
+                    if (/calendar-master\/events\/.+/.test(entry.path)) {
+                        const chunks = [];
+
+                        entry.on('data', chunk => chunks.push(chunk))
+                        entry.on('error', done)
+                        entry.on('end', () => this.eventFiles[entry.path] = Buffer.concat(chunks).toString('utf8'));
+                    } else {
+                        entry.autodrain();
+                    }
+                })
+                .on('finish', done);
+        }).on('error', (err) => {
+            done(err);
+        });
+    })
+
+    it('#fromYaml()', function () {
+        for (const fileName in this.eventFiles) {
+            const data = this.eventFiles[fileName];
+
+            console.log(data)
+
+            const event = WSEvent.fromYaml(data);
+
+            const yamlData = YAML.parse(data);
+
+            const dateSplit = yamlData.date.split('-');
+            const timeSplit = (yamlData.time || '00:00 23:59').split(/[ -]/);
+
+            const timeFirst = timeSplit[0].split(':');
+            if (timeFirst.length == 2) {
+                if (timeFirst[0].length < 2) {
+                    timeFirst[0] = `0${timeFirst[0]}`;
+                } else if (timeFirst[0].length > 2) {
+                    timeFirst[0] = '00';
+                }
+                if (timeFirst[1].length < 2) {
+                    timeFirst[1] = `0${timeFirst[0]}`;
+                } else if (timeFirst[1].length > 2) {
+                    timeFirst[1] = '00';
+                }
+                timeSplit[0] = `${timeFirst[0]}${timeFirst[1]}`;
             }
-            fs.mkdirSync(testDir);
 
-            const fileEvents = path.join(testDir, 'master.zip');
-
-            const file = fs.createWriteStream(fileEvents);
-            https.get(urlEvents, (response) => {
-                response.pipe(file);
-                file.on('finish', function () {
-                    file.close(() => {
-                        fs.createReadStream(fileEvents).pipe(unzip.Extract({
-                                path: testDir
-                            }))
-                            .on('close', () => {
-                                done();
-                            });
-
-                    });
-                });
-            }).on('error', (err) => {
-                done(err);
-            });
-        });
-
-        const files = fs.readdirSync(eventsDir).filter((file) => {
-            return /\.ya?ml$/.test(file.toLowerCase());
-        });
-
-        for (const file of files) {
-            it(file, () => {
-                const data = fs.readFileSync(path.join(eventsDir, file), 'utf-8');
-
-                const event = WSEvent.fromYaml(data);
-
-                const yaml_data = YAML.parse(data);
-
-                //console.log(yaml_data.date, yaml_data.time);
-                //console.log(event.start, event.finish);
-
-                const dateSplit = yaml_data.date.split('-');
-                const timeSplit = (yaml_data.time || '00:00 23:59').split(/[ -]/);
-
-                const timeFirst = timeSplit[0].split(':');
-                if (timeFirst.length == 2) {
-                    if (timeFirst[0].length < 2) {
-                        timeFirst[0] = `0${timeFirst[0]}`;
-                    } else if (timeFirst[0].length > 2) {
-                        timeFirst[0] = '00';
-                    }
-                    if (timeFirst[1].length < 2) {
-                        timeFirst[1] = `0${timeFirst[0]}`;
-                    } else if (timeFirst[1].length > 2) {
-                        timeFirst[1] = '00';
-                    }
-                    timeSplit[0] = `${timeFirst[0]}${timeFirst[1]}`;
+            const timeSecond = timeSplit[0].split(':');
+            if (timeSecond.length == 2) {
+                if (timeSecond[0].length < 2) {
+                    timeSecond[0] = `0${timeSecond[0]}`;
+                } else if (timeSecond[0].length > 2) {
+                    timeSecond[0] = '23';
                 }
-
-                const timeSecond = timeSplit[0].split(':');
-                if (timeSecond.length == 2) {
-                    if (timeSecond[0].length < 2) {
-                        timeSecond[0] = `0${timeSecond[0]}`;
-                    } else if (timeSecond[0].length > 2) {
-                        timeSecond[0] = '23';
-                    }
-                    if (timeSecond[1].length < 2) {
-                        timeSecond[1] = `0${timeSecond[0]}`;
-                    } else if (timeSecond[1].length > 2) {
-                        timeSecond[1] = '59';
-                    }
-                    timeSplit[1] = `${timeSecond[0]}${timeSecond[1]}`;
+                if (timeSecond[1].length < 2) {
+                    timeSecond[1] = `0${timeSecond[0]}`;
+                } else if (timeSecond[1].length > 2) {
+                    timeSecond[1] = '59';
                 }
+                timeSplit[1] = `${timeSecond[0]}${timeSecond[1]}`;
+            }
 
 
-                let start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
-                let finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
+            let start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
+            let finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
 
-                console.log(yaml_data.date, yaml_data.time)
-                console.log(start, `${dateSplit[0]} ${timeSplit[0] || '0000'}`);
-                console.log(finish, `${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`);
-                console.log(`${event.name}\n\n${moment(event.start).utc().format("DD.MM.YYYY")}\n${event.city}\n${event.link}`);
-
-                assert.equal(event instanceof WSEvent, true);
-                assert.equal(event.name, yaml_data.name);
-                assert.equal(event.city, yaml_data.city);
-                assert.equal(event.link, yaml_data.link);
-                assert.equal(event.start.valueOf(), start.valueOf());
-                assert.equal(event.finish.valueOf(), finish.valueOf());
-                assert.equal(event.finish > event.start, true);
-            });
+            assert.equal(event instanceof WSEvent, true);
+            assert.equal(event.name, yamlData.name);
+            assert.equal(event.city, yamlData.city);
+            assert.equal(event.link, yamlData.link);
+            assert.equal(event.start.valueOf(), start.valueOf());
+            assert.equal(event.finish.valueOf(), finish.valueOf());
+            assert.equal(event.finish > event.start, true);
         }
     });
 
-    const msgs = {};
-
-    describe('sendEvent()', () => {
-        const files = fs.readdirSync(eventsDir).filter((file) => {
-            return /\.ya?ml$/.test(file.toLowerCase());
-        });
-
-        for (const file of files) {
-            it(file, (done) => {
-                const data = fs.readFileSync(path.join(eventsDir, file), 'utf-8');
-
-                const event = WSEvent.fromYaml(data);
-
-                sendEvent(event, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
-                    .then((res) => {
-                        const body = JSON.parse(res.body);
-                        if (res.status != 200 || !body.ok) {
-                            return done(body);
-                        }
-                        msgs[body.result.message_id] = {
-                            text: body.text
-                        };
-
-                        done();
-                    })
-                    .catch((err) => {
-                        console.warn(err);
-                        done(err);
-                    });
-            }).timeout(60000);
+    it('sendEvent()', async function () {
+        if (!!!process.env.TOKEN) {
+            throw new Error('Not set env TOKEN');
         }
-    });
 
-    describe('deleteMessage()', () => {
-        it('Delete', (done) => {
-            const gen = generatorMsgs(msgs);
-            const _ = () => {
-                const next = gen.next();
-                if (next.done) {
-                    return done();
-                }
+        if (!!!process.env.CHANNEL) {
+            throw new Error('Not set env CHANNEL');
+        }
 
-                console.log('Rm', next.value.msgId);
+        for (const fileName in this.eventFiles) {
+            const data = this.eventFiles[fileName];
 
-                deleteMessage(next.value.msgId, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
-                    .then((res) => {
-                        const body = JSON.parse(res.body);
-                        if (res.status != 200 || !body.ok) {
-                            return data(body);
-                        }
-                        _();
-                    })
-                    .catch((err) => {
-                        console.warn(err);
-                        done(err);
-                    });
+            const event = WSEvent.fromYaml(data);
+
+            const response = await sendEvent(event, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
+
+            const body = JSON.parse(response.body);
+            assert.equal(response.status, 200);
+            assert.ok(body.ok);
+            this.msgs[body.result.message_id] = {
+                text: body.text
             };
+        }
+    }).timeout(-1);
 
-            _();
-        }).timeout(-1);
-    });
+    it('deleteMessage()', async function () {
+        for (const msgId in this.msgs) {
+            const response = await deleteMessage(msgId, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
+
+            const body = JSON.parse(response.body);
+            assert.equal(response.status, 200);
+            assert.ok(body.ok);
+        }
+    }).timeout(-1);
 });
