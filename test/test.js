@@ -48,8 +48,6 @@ describe('WSEvent', () => {
         for (const fileName in this.eventFiles) {
             const data = this.eventFiles[fileName];
 
-            console.log(data)
-
             const event = WSEvent.fromYaml(data);
 
             const yamlData = YAML.parse(data);
@@ -98,6 +96,7 @@ describe('WSEvent', () => {
             assert.equal(event.start.valueOf(), start.valueOf());
             assert.equal(event.finish.valueOf(), finish.valueOf());
             assert.equal(event.finish > event.start, true);
+            assert.equal(event.isOnline, yamlData.online || false);
         }
     });
 
