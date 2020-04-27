@@ -101,11 +101,11 @@ describe('WSEvent', () => {
     });
 
     it('sendEvent()', async function () {
-        if (!!!process.env.TOKEN) {
+        if (!process.env.TOKEN) {
             throw new Error('Not set env TOKEN');
         }
 
-        if (!!!process.env.CHANNEL) {
+        if (!process.env.CHANNEL) {
             throw new Error('Not set env CHANNEL');
         }
 
