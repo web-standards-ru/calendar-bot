@@ -1,9 +1,7 @@
-"use strict";
+import YAML from 'yaml';
+import moment from 'moment';
 
-const YAML = require('yaml');
-const moment = require('moment');
-
-const DATE_FORMAT = 'DDMMYYYYHHmm';
+export const DATE_FORMAT = 'DDMMYYYYHHmm';
 
 /**
  * Класс, описывающий событие
@@ -129,4 +127,4 @@ class WSEvent {
 
 }
 
-module.exports = WSEvent;
+export default WSEvent;

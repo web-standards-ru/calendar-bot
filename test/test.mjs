@@ -1,27 +1,22 @@
-"use strict";
+import assert from "assert";
+import https from 'https';
+import unzipper from 'unzipper';
 
-const path = require('path');
-const https = require('https');
+import YAML from 'yaml';
+import moment from 'moment';
 
-const unzipper = require('unzipper');
-const YAML = require('yaml');
-const moment = require('moment');
-
-const DATE_FORMAT = 'DDMMYYYYHHmm';
-
-const WSEvent = require('../wsevent.js');
-const {
-    sendEvent,
-    deleteMessage
-} = require('../tlgrm.js');
-
-const assert = require('assert');
-
-const URL_EVENTS = 'https://codeload.github.com/web-standards-ru/calendar/zip/master';
+import getEvents from "../helpers/get_events.mjs";
+import {
+    URL_EVENTS
+} from "../helpers/get_events.mjs";
+import WSEvent from "../types/wsevent.mjs";
+import {
+    DATE_FORMAT
+} from "../types/wsevent.mjs";
 
 describe('WSEvent', () => {
     before(function (done) {
-        this.timeout(60000);
+        this.timeout(10000);
         this.eventFiles = {};
         this.msgs = {};
 
@@ -39,9 +34,7 @@ describe('WSEvent', () => {
                     }
                 })
                 .on('finish', done);
-        }).on('error', (err) => {
-            done(err);
-        });
+        }).on('error', done);
     })
 
     it('#fromYaml()', function () {
@@ -100,6 +93,21 @@ describe('WSEvent', () => {
         }
     });
 
+});
+
+describe('Github repo', async () => {
+    it('get events', async function () {
+        this.timeout(10000);
+        const eventFiles = await getEvents();
+        assert.equal(typeof eventFiles, 'object');
+        assert.ok(Object.keys(eventFiles).length > 0);
+        assert.ok(Object.values(eventFiles).filter(event => !(event instanceof WSEvent)).length == 0);
+    });
+});
+
+/*
+describe('WSEvent', () => {
+
     it('sendEvent()', async function () {
         if (!process.env.TOKEN) {
             throw new Error('Not set env TOKEN');
@@ -135,4 +143,4 @@ describe('WSEvent', () => {
             assert.ok(body.ok);
         }
     }).timeout(-1);
-});
+});*/

@@ -1,6 +1,6 @@
 {
   "name": "@web-standards-ru/calendar-bot",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Module for post events from web-standards-ru/calendar",
   "main": "index.js",
   "directories": {
@@ -23,13 +23,13 @@
   },
   "homepage": "https://github.com/web-standards-ru/calendar-bot#readme",
   "devDependencies": {
-    "mocha": "^6.2.3",
-    "unzipper": "^0.10.11"
+    "mocha": "^7.2.0"
   },
   "dependencies": {
     "moment": "^2.24.0",
     "socks-proxy-agent": "^4.0.2",
     "yaml": "^1.9.2",
-    "yargs": "^13.3.2"
+    "yargs": "^13.3.2",
+    "unzipper": "^0.10.11"
   }
 }
