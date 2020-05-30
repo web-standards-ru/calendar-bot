@@ -23,13 +23,16 @@
   },
   "homepage": "https://github.com/web-standards-ru/calendar-bot#readme",
   "devDependencies": {
-    "mocha": "^7.2.0"
+    "mocha": "^7.2.0",
+    "uuidv4": "^6.1.0"
   },
   "dependencies": {
     "moment": "^2.24.0",
     "socks-proxy-agent": "^4.0.2",
+    "sqlite": "^4.0.9",
+    "sqlite3": "^4.2.0",
+    "unzipper": "^0.10.11",
     "yaml": "^1.9.2",
-    "yargs": "^13.3.2",
-    "unzipper": "^0.10.11"
+    "yargs": "^13.3.2"
   }
 }

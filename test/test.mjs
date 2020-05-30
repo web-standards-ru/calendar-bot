@@ -2,6 +2,7 @@ import assert from "assert";
 import https from 'https';
 import unzipper from 'unzipper';
 
+import uuid from 'uuidv4';
 import YAML from 'yaml';
 import moment from 'moment';
 
@@ -13,6 +14,15 @@ import WSEvent from "../types/wsevent.mjs";
 import {
     DATE_FORMAT
 } from "../types/wsevent.mjs";
+
+import {
+    openDb,
+    getEvent,
+    EventStatus,
+    postEvent
+} from "../db.mjs";
+
+import mdEvent from "../helpers/md_event.mjs";
 
 describe('WSEvent', () => {
     before(function (done) {
@@ -102,6 +112,54 @@ describe('Github repo', async () => {
         assert.equal(typeof eventFiles, 'object');
         assert.ok(Object.keys(eventFiles).length > 0);
         assert.ok(Object.values(eventFiles).filter(event => !(event instanceof WSEvent)).length == 0);
+    });
+});
+
+describe('Db', () => {
+    before(async function () {
+        this.eventText = `
+name: test
+date: 01.01.2020
+city: Москва
+link: https://test.dev/
+        `;
+        this.eventFileName = 'test';
+        this.event = WSEvent.fromYaml(this.eventText);
+        this.eventMD = mdEvent(this.event);
+        this.eventMDUpdate = `${this.eventMD} / update`;
+
+        this.msgId = 1;
+
+        this.db = await openDb(`/tmp/${uuid.uuid()}.db`);
+        await this.db.migrate();
+    });
+
+    after(async function () {
+        await this.db.close();
+    });
+
+    it('get uncreated', async function () {
+        const {
+            action
+        } = await getEvent(this.eventFileName, this.event, this.eventMD, this.db);
+        assert.equal(action, EventStatus.notFound);
+    });
+
+    it('post', async function () {
+        await postEvent(this.eventFileName, this.event, this.eventMD, this.msgId, this.db);
+        const {
+            action
+        } = await getEvent(this.eventFileName, this.event, this.eventMD, this.db);
+        assert.equal(action, EventStatus.ok);
+    });
+
+    it('get update', async function () {
+        const {
+            action,
+            messageId
+        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        assert.equal(action, EventStatus.needUpdate);
+        assert.equal(typeof messageId, 'number');
     });
 });
 
