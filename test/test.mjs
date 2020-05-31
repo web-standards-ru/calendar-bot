@@ -25,7 +25,7 @@ import {
 
 import mdEvent from "../helpers/md_event.mjs";
 
-/*describe('WSEvent', () => {
+/describe('WSEvent', () => {
     before(function (done) {
         this.timeout(10000);
         this.eventFiles = {};
@@ -114,7 +114,7 @@ describe('Github repo', async () => {
         assert.ok(Object.keys(eventFiles).length > 0);
         assert.ok(Object.values(eventFiles).filter(event => !(event instanceof WSEvent)).length == 0);
     });
-});*/
+});
 
 describe('Db', () => {
     before(async function () {
