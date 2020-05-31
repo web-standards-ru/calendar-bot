@@ -19,12 +19,13 @@ import {
     openDb,
     getEvent,
     EventStatus,
-    postEvent
+    postEvent,
+    deleteEvent
 } from "../db.mjs";
 
 import mdEvent from "../helpers/md_event.mjs";
 
-describe('WSEvent', () => {
+/*describe('WSEvent', () => {
     before(function (done) {
         this.timeout(10000);
         this.eventFiles = {};
@@ -113,7 +114,7 @@ describe('Github repo', async () => {
         assert.ok(Object.keys(eventFiles).length > 0);
         assert.ok(Object.values(eventFiles).filter(event => !(event instanceof WSEvent)).length == 0);
     });
-});
+});*/
 
 describe('Db', () => {
     before(async function () {
@@ -153,13 +154,43 @@ link: https://test.dev/
         assert.equal(action, EventStatus.ok);
     });
 
-    it('get update', async function () {
+    it('get changed', async function () {
         const {
             action,
             messageId
         } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
         assert.equal(action, EventStatus.needUpdate);
         assert.equal(typeof messageId, 'number');
+    });
+
+    it('delete', async function () {
+        await deleteEvent(this.eventFileName, this.event, this.eventMDUpdate, this.msgId, this.db);
+        const {
+            action
+        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        assert.equal(action, EventStatus.needPost);
+    });
+
+    it('post changed', async function () {
+        await postEvent(this.eventFileName, this.event, this.eventMDUpdate, this.msgId, this.db);
+        const {
+            action
+        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        assert.equal(action, EventStatus.ok);
+    });
+
+    it('get not changed', async function () {
+        const {
+            action
+        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        assert.equal(action, EventStatus.ok);
+    });
+
+    it('get changed', async function () {
+        const {
+            action
+        } = await getEvent(this.eventFileName, this.event, this.eventMD, this.db);
+        assert.equal(action, EventStatus.needUpdate);
     });
 });
 

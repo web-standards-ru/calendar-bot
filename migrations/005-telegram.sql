@@ -4,9 +4,10 @@
 
 CREATE TABLE telegram
 (
+    id INTEGER PRIMARY KEY NOT NULL,
     event_id INTEGER,
     event_action_id INTEGER,
-    created INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+    created REAL NOT NULL DEFAULT (julianday('now')),
     name TEXT NOT NULL,
     city TEXT NOT NULL,
     link TEXT NOT NULL,

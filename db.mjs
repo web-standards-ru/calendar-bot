@@ -38,9 +38,10 @@ export async function getEvent(fileName, event, markdown, db = null) {
 
     const rows = await db.all(`
 select
-    ea.name,
-    t.markdown,
-    t.message_id
+    ea.name
+    ,t.markdown
+    ,t.message_id
+    ,t.created
 from
     events as e
     left outer join telegram as t on e.id = t.event_id
@@ -48,7 +49,8 @@ from
 where 
     e.file_name = ?
 order by
-    t.created desc
+    t.created desc,
+    t.id desc
 limit 1;    
     `, fileName);
 
@@ -69,6 +71,13 @@ limit 1;
             action: EventStatus.ok
         }
     }
+
+    if (markdown === rows[0].markdown && rows[0].name == 'delete') {
+        return {
+            action: EventStatus.needPost
+        }
+    }
+
 
     return {
         action: EventStatus.needUpdate,
@@ -98,13 +107,12 @@ export async function postEvent(fileName, event, markdown, messageId, db = null)
     }
 
     const {
-        lastID,
         changes
     } = await db.run(`
 insert into events (file_name)
 values             (?)
 ON CONFLICT(file_name) DO UPDATE SET
-    updated = strftime('%s','now');
+    updated = julianday('now');
 `, fileName);
 
     if (changes !== 1) {
@@ -127,7 +135,7 @@ insert into telegram (
     markdown,
     message_id)
 values (
-    ?,
+    (select id from events where file_name = ?),
     (select id from event_actions where name = 'post'),
     ?,
     ?,
@@ -139,7 +147,7 @@ values (
     ?
     );
 `,
-            lastID,
+            fileName,
             event.name,
             event.city,
             event.link,
@@ -155,6 +163,66 @@ values (
     }
 }
 
-export async function deleteEvent(fileName, event, db = null) {
+export async function deleteEvent(fileName, event, markdown, messageId, db = null) {
+    if (typeof fileName != 'string' || !!!fileName) {
+        throw new TypeError(fileName);
+    }
 
+    if (!(event instanceof WSEvent)) {
+        throw new TypeError(event);
+    }
+
+    if (typeof markdown != 'string' || !!!markdown) {
+        throw new TypeError(markdown);
+    }
+
+    if (typeof messageId != 'number') {
+        throw new TypeError(markdown);
+    }
+
+    if (!!!db) {
+        db = await openDb();
+    }
+
+    const {
+        changes
+    } = await db.run(`
+insert into telegram (
+    event_id,
+    event_action_id,
+    name,
+    city,
+    link,
+    start,
+    finish,
+    online,
+    markdown,
+    message_id)
+values (
+    (select id from events where file_name = ?),
+    (select id from event_actions where name = 'delete'),
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?
+    );
+`,
+        fileName,
+        event.name,
+        event.city,
+        event.link,
+        event.start.valueOf(),
+        event.finish.valueOf(),
+        event.isOnline,
+        markdown,
+        messageId
+    );
+
+    if (changes !== 1) {
+        throw new Error(`Error changes ${changes}`);
+    }
 };
