@@ -25,6 +25,11 @@ import {
 
 import mdEvent from "../helpers/md_event.mjs";
 
+import {
+    sendMsg,
+    removeMsg
+} from "../helpers/telegram.mjs";
+
 describe('WSEvent', () => {
     before(function (done) {
         this.timeout(10000);
@@ -193,42 +198,50 @@ link: https://test.dev/
     });
 });
 
-/*
-describe('WSEvent', () => {
+describe('Telegram API', () => {
+    before(async function () {
+        this.eventText = `
+name: test
+date: 01.01.2020
+city: Москва
+link: https://test.dev/
+        `;
+        this.event = WSEvent.fromYaml(this.eventText);
+        this.eventMD = mdEvent(this.event);
+    });
 
-    it('sendEvent()', async function () {
-        if (!process.env.TOKEN) {
-            throw new Error('Not set env TOKEN');
+    it('send', async function () {
+        const {
+            status,
+            body
+        } = await sendMsg(this.eventMD);
+        assert.equal(status, 200);
+        assert.ok(body.ok);
+        this.messageId = body.result.message_id;
+        assert.equal(typeof this.messageId, 'number');
+    });
+
+    it('delete', async function () {
+        const {
+            status,
+            body
+        } = await removeMsg(this.messageId);
+        assert.equal(status, 200);
+        assert.ok(body.ok);
+    });
+
+    it('many request 100', async function () {
+        this.timeout(-1);
+        for (let i = 0; i < 100; ++i) {
+            const resSend = await sendMsg(this.eventMD);
+            assert.equal(resSend.status, 200);
+            assert.ok(resSend.body.ok);
+            const msgId = resSend.body.result.message_id;
+            assert.equal(typeof msgId, 'number');
+
+            const resRemove = await removeMsg(msgId);
+            assert.equal(resRemove.status, 200);
+            assert.ok(resRemove.body.ok);
         }
-
-        if (!process.env.CHANNEL) {
-            throw new Error('Not set env CHANNEL');
-        }
-
-        const eventsToSend = Object.keys(this.eventFiles)
-            .map(fileName => WSEvent.fromYaml(this.eventFiles[fileName]))
-            .sort((le, re) => re.start.valueOf() - le.start.valueOf())
-            .slice(0, 10);
-
-        for (const event of eventsToSend) {
-            const response = await sendEvent(event, process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
-
-            const body = JSON.parse(response.body);
-            assert.equal(response.status, 200);
-            assert.ok(body.ok);
-            this.msgs[body.result.message_id] = {
-                text: body.text
-            };
-        }
-    }).timeout(-1);
-
-    it('deleteMessage()', async function () {
-        for (const msgId in this.msgs) {
-            const response = await deleteMessage(parseInt(msgId), process.env.TOKEN, process.env.CHANNEL, process.env.PROXY)
-
-            const body = JSON.parse(response.body);
-            assert.equal(response.status, 200);
-            assert.ok(body.ok);
-        }
-    }).timeout(-1);
-});*/
+    });
+});

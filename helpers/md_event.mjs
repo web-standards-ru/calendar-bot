@@ -2,6 +2,8 @@ import moment from 'moment';
 
 import WSEvent from "../types/wsevent.mjs";
 
+moment.locale('ru');
+
 export default function (event) {
     if (!(event instanceof WSEvent)) {
         throw new TypeError(event);

@@ -4,3 +4,4 @@ test/events/
 .tmp/
 senders/
 events/
+.env

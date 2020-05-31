@@ -27,6 +27,7 @@
     "uuidv4": "^6.1.0"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
     "moment": "^2.24.0",
     "socks-proxy-agent": "^4.0.2",
     "sqlite": "^4.0.9",

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+/*#!/usr/bin/env node
 
 'use strict';
 
@@ -37,3 +37,4 @@ Promise.all(events)
         console.error(err);
         process.exit(1);
     });
+*/
