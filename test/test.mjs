@@ -25,7 +25,7 @@ import {
 
 import mdEvent from "../helpers/md_event.mjs";
 
-/describe('WSEvent', () => {
+describe('WSEvent', () => {
     before(function (done) {
         this.timeout(10000);
         this.eventFiles = {};
@@ -103,7 +103,6 @@ import mdEvent from "../helpers/md_event.mjs";
             assert.equal(event.isOnline, yamlData.online || false);
         }
     });
-
 });
 
 describe('Github repo', async () => {
