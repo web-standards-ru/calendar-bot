@@ -1,7 +1,3 @@
 node_modules/
-test/events/
-.test.sh
-.tmp/
-senders/
-events/
+*.db
 .env

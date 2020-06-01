@@ -9,7 +9,7 @@ CREATE TABLE telegram
     event_action_id INTEGER,
     created REAL NOT NULL DEFAULT (julianday('now')),
     name TEXT NOT NULL,
-    city TEXT NOT NULL,
+    city TEXT,
     link TEXT NOT NULL,
     start INTEGER NOT NULL,
     finish INTEGER NOT NULL,

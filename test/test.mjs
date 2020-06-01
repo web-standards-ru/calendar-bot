@@ -1,3 +1,5 @@
+import '../config.mjs';
+
 import assert from "assert";
 import https from 'https';
 import unzipper from 'unzipper';
@@ -5,6 +7,10 @@ import unzipper from 'unzipper';
 import uuid from 'uuidv4';
 import YAML from 'yaml';
 import moment from 'moment';
+
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+chai.use(chaiHttp);
 
 import getEvents from "../helpers/get_events.mjs";
 import {
@@ -30,7 +36,17 @@ import {
     removeMsg
 } from "../helpers/telegram.mjs";
 
-describe('WSEvent', () => {
+import createServer from "../server.mjs";
+
+const {
+    API_TOKEN
+} = process.env;
+
+if (!!!API_TOKEN) {
+    throw new Error('Not set env API_TOKEN');
+}
+
+/*describe('WSEvent', () => {
     before(function (done) {
         this.timeout(10000);
         this.eventFiles = {};
@@ -101,7 +117,7 @@ describe('WSEvent', () => {
             assert.equal(event instanceof WSEvent, true);
             assert.equal(event.name, yamlData.name);
             assert.equal(event.city, yamlData.city);
-            assert.equal(event.link, yamlData.link);
+            assert.equal(event.link, yamlData.link || yamlData.url);
             assert.equal(event.start.valueOf(), start.valueOf());
             assert.equal(event.finish.valueOf(), finish.valueOf());
             assert.equal(event.finish > event.start, true);
@@ -243,5 +259,62 @@ link: https://test.dev/
             assert.equal(resRemove.status, 200);
             assert.ok(resRemove.body.ok);
         }
+    });
+});*/
+
+describe('Microservice', function () {
+    before(function() {
+        const {
+            app,
+            server
+        } = createServer();
+
+        this.app = app;
+        this.server = server;
+    });
+
+    after(function() {
+        this.server.close();
+    });
+
+    describe('API', function (done) {
+        it('error token', function (done) {
+            chai.request(this.app)
+                .get(`/?token=${API_TOKEN}1`)
+                .end((err, res) => {
+                    assert.equal(res.status, 400);
+                    done(err);
+                });
+        });
+
+        it('first request', function (done) {
+            this.timeout(-1);
+
+            chai.request(this.app)
+                .get(`/?token=${API_TOKEN}`)
+                .end((err, res) => {
+                    assert.equal(res.status, 200);
+                    assert.equal(res.body.events.posted, res.body.events.all);
+                    assert.equal(res.body.events.ok, 0);
+                    assert.equal(res.body.events.updated, 0);
+                    assert.equal(res.body.events.ok + res.body.events.posted + res.body.events.updated, res.body.events.all);
+                    done(err);
+                });
+        });
+
+        it('repeat request', function (done) {
+            this.timeout(20000);
+
+            chai.request(this.app)
+                .get(`/?token=${API_TOKEN}`)
+                .end((err, res) => {
+                    assert.equal(res.status, 200);
+                    assert.equal(res.body.events.posted, 0);
+                    assert.equal(res.body.events.updated, 0);
+                    assert.equal(res.body.events.ok, res.body.events.all);
+                    assert.equal(res.body.events.ok + res.body.events.posted + res.body.events.updated, res.body.events.all);
+                    done(err);
+                });
+        });
     });
 });

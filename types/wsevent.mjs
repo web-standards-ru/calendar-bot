@@ -6,7 +6,7 @@ export const DATE_FORMAT = 'DDMMYYYYHHmm';
 /**
  * Класс, описывающий событие
  */
-class WSEvent {
+export default class WSEvent {
     /**
      * Конструктор WSEvent
      * @constructor
@@ -26,7 +26,15 @@ class WSEvent {
         this._isOnline = isOnline;
 
         if (this._finish <= this._start) {
-            throw new Error('Finish <= start');
+            throw new TypeError(`Finish ${this.finish} /  <= start ${this.start}`);
+        }
+
+        if(!!!this._city && !this.isOnline) {
+            throw new TypeError(`Not set city`)
+        }
+
+        if(!!!this._link) {
+            throw new TypeError(`Not set link`)
         }
     }
 
@@ -122,9 +130,6 @@ class WSEvent {
         const start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
         const finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
 
-        return new WSEvent(yamlData.name, yamlData.city, yamlData.link, start, finish, yamlData.online || false);
+        return new WSEvent(yamlData.name, yamlData.city, yamlData.link || yamlData.url, start, finish, yamlData.online || false);
     }
-
 }
-
-export default WSEvent;

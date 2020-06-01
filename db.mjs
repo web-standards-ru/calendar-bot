@@ -12,7 +12,11 @@ export const EventStatus = {
     needUpdate: 4
 };
 
-export async function openDb(filename = '/tmp/database.db', ) {
+const {
+    DB_BAME = '/var/lib/calendar_bot.db'
+} = process.env;
+
+export async function openDb(filename = DB_BAME) {
     return open({
         filename: filename,
         driver: sqlite3.Database

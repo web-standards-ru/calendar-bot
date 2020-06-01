@@ -2,9 +2,6 @@ import url from 'url';
 import https from 'https';
 import SocksProxyAgent from 'socks-proxy-agent';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const {
     TOKEN,
     CHANNEL,
