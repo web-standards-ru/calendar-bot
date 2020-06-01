@@ -46,7 +46,7 @@ if (!!!API_TOKEN) {
     throw new Error('Not set env API_TOKEN');
 }
 
-/*describe('WSEvent', () => {
+describe('WSEvent', () => {
     before(function (done) {
         this.timeout(10000);
         this.eventFiles = {};
@@ -260,10 +260,10 @@ link: https://test.dev/
             assert.ok(resRemove.body.ok);
         }
     });
-});*/
+});
 
 describe('Microservice', function () {
-    before(function() {
+    before(async function() {
         const {
             app,
             server
@@ -271,6 +271,10 @@ describe('Microservice', function () {
 
         this.app = app;
         this.server = server;
+
+        const db = await openDb();
+        await db.migrate();
+        await db.close();
     });
 
     after(function() {
