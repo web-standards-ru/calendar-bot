@@ -1,6 +1,6 @@
 import '../config.mjs';
 
-import assert from "assert";
+import assert from 'assert';
 import https from 'https';
 import unzipper from 'unzipper';
 
@@ -12,37 +12,28 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 
-import getEvents from "../helpers/get_events.mjs";
-import {
-    URL_EVENTS
-} from "../helpers/get_events.mjs";
-import WSEvent from "../types/wsevent.mjs";
-import {
-    DATE_FORMAT
-} from "../types/wsevent.mjs";
+import getEvents from '../helpers/get_events.mjs';
+import { URL_EVENTS } from '../helpers/get_events.mjs';
+import WSEvent from '../types/wsevent.mjs';
+import { DATE_FORMAT } from '../types/wsevent.mjs';
 
 import {
     openDb,
     getEvent,
     EventStatus,
     postEvent,
-    deleteEvent
-} from "../db.mjs";
+    deleteEvent,
+} from '../db.mjs';
 
-import mdEvent from "../helpers/md_event.mjs";
+import mdEvent from '../helpers/md_event.mjs';
 
-import {
-    sendMsg,
-    removeMsg
-} from "../helpers/telegram.mjs";
+import { sendMsg, removeMsg } from '../helpers/telegram.mjs';
 
-import createServer from "../server.mjs";
+import createServer from '../server.mjs';
 
-const {
-    API_TOKEN
-} = process.env;
+const { API_TOKEN } = process.env;
 
-if (!!!API_TOKEN) {
+if (!API_TOKEN) {
     throw new Error('Not set env API_TOKEN');
 }
 
@@ -52,22 +43,31 @@ describe('WSEvent', () => {
         this.eventFiles = {};
         this.msgs = {};
 
-        https.get(URL_EVENTS, response => {
-            response.pipe(unzipper.Parse())
-                .on('entry', entry => {
-                    if (/calendar-master\/events\/.+/.test(entry.path)) {
-                        const chunks = [];
+        https
+            .get(URL_EVENTS, response => {
+                response
+                    .pipe(unzipper.Parse())
+                    .on('entry', entry => {
+                        if (/calendar-master\/events\/.+/.test(entry.path)) {
+                            const chunks = [];
 
-                        entry.on('data', chunk => chunks.push(chunk))
-                        entry.on('error', done)
-                        entry.on('end', () => this.eventFiles[entry.path] = Buffer.concat(chunks).toString('utf8'));
-                    } else {
-                        entry.autodrain();
-                    }
-                })
-                .on('finish', done);
-        }).on('error', done);
-    })
+                            entry.on('data', chunk => chunks.push(chunk));
+                            entry.on('error', done);
+                            entry.on(
+                                'end',
+                                () =>
+                                    (this.eventFiles[
+                                        entry.path
+                                    ] = Buffer.concat(chunks).toString('utf8')),
+                            );
+                        } else {
+                            entry.autodrain();
+                        }
+                    })
+                    .on('finish', done);
+            })
+            .on('error', done);
+    });
 
     it('#fromYaml()', function () {
         for (const fileName in this.eventFiles) {
@@ -110,9 +110,24 @@ describe('WSEvent', () => {
                 timeSplit[1] = `${timeSecond[0]}${timeSecond[1]}`;
             }
 
-
-            let start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
-            let finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
+            const start = moment
+                .utc(
+                    `${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(
+                        /\D/g,
+                        '',
+                    ),
+                    DATE_FORMAT,
+                )
+                .toDate();
+            const finish = moment
+                .utc(
+                    `${dateSplit[1] || dateSplit[0]} ${
+                        timeSplit[1] || '2359'
+                    }`.replace(/\D/g, ''),
+                    DATE_FORMAT,
+                )
+                .utc()
+                .toDate();
 
             assert.equal(event instanceof WSEvent, true);
             assert.equal(event.name, yamlData.name);
@@ -132,7 +147,11 @@ describe('Github repo', async () => {
         const eventFiles = await getEvents();
         assert.equal(typeof eventFiles, 'object');
         assert.ok(Object.keys(eventFiles).length > 0);
-        assert.ok(Object.values(eventFiles).filter(event => !(event instanceof WSEvent)).length == 0);
+        assert.ok(
+            Object.values(eventFiles).filter(
+                event => !(event instanceof WSEvent),
+            ).length == 0,
+        );
     });
 });
 
@@ -160,56 +179,94 @@ link: https://test.dev/
     });
 
     it('get uncreated', async function () {
-        const {
-            action
-        } = await getEvent(this.eventFileName, this.event, this.eventMD, this.db);
+        const { action } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMD,
+            this.db,
+        );
         assert.equal(action, EventStatus.notFound);
     });
 
     it('post', async function () {
-        await postEvent(this.eventFileName, this.event, this.eventMD, this.msgId, this.db);
-        const {
-            action
-        } = await getEvent(this.eventFileName, this.event, this.eventMD, this.db);
+        await postEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMD,
+            this.msgId,
+            this.db,
+        );
+        const { action } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMD,
+            this.db,
+        );
         assert.equal(action, EventStatus.ok);
     });
 
     it('get changed', async function () {
-        const {
-            action,
-            messageId
-        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        const { action, messageId } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMDUpdate,
+            this.db,
+        );
         assert.equal(action, EventStatus.needUpdate);
         assert.equal(typeof messageId, 'number');
     });
 
     it('delete', async function () {
-        await deleteEvent(this.eventFileName, this.event, this.eventMDUpdate, this.msgId, this.db);
-        const {
-            action
-        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        await deleteEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMDUpdate,
+            this.msgId,
+            this.db,
+        );
+        const { action } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMDUpdate,
+            this.db,
+        );
         assert.equal(action, EventStatus.needPost);
     });
 
     it('post changed', async function () {
-        await postEvent(this.eventFileName, this.event, this.eventMDUpdate, this.msgId, this.db);
-        const {
-            action
-        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        await postEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMDUpdate,
+            this.msgId,
+            this.db,
+        );
+        const { action } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMDUpdate,
+            this.db,
+        );
         assert.equal(action, EventStatus.ok);
     });
 
     it('get not changed', async function () {
-        const {
-            action
-        } = await getEvent(this.eventFileName, this.event, this.eventMDUpdate, this.db);
+        const { action } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMDUpdate,
+            this.db,
+        );
         assert.equal(action, EventStatus.ok);
     });
 
     it('get changed', async function () {
-        const {
-            action
-        } = await getEvent(this.eventFileName, this.event, this.eventMD, this.db);
+        const { action } = await getEvent(
+            this.eventFileName,
+            this.event,
+            this.eventMD,
+            this.db,
+        );
         assert.equal(action, EventStatus.needUpdate);
     });
 });
@@ -227,10 +284,7 @@ link: https://test.dev/
     });
 
     it('send', async function () {
-        const {
-            status,
-            body
-        } = await sendMsg(this.eventMD);
+        const { status, body } = await sendMsg(this.eventMD);
         assert.equal(status, 200);
         assert.ok(body.ok);
         this.messageId = body.result.message_id;
@@ -238,10 +292,7 @@ link: https://test.dev/
     });
 
     it('delete', async function () {
-        const {
-            status,
-            body
-        } = await removeMsg(this.messageId);
+        const { status, body } = await removeMsg(this.messageId);
         assert.equal(status, 200);
         assert.ok(body.ok);
     });
@@ -263,11 +314,8 @@ link: https://test.dev/
 });
 
 describe('Microservice', function () {
-    before(async function() {
-        const {
-            app,
-            server
-        } = createServer();
+    before(async function () {
+        const { app, server } = createServer();
 
         this.app = app;
         this.server = server;
@@ -277,12 +325,12 @@ describe('Microservice', function () {
         await db.close();
     });
 
-    after(function() {
+    after(function () {
         this.server.close();
     });
 
-    describe('API', function (done) {
-        it('error token', function (done) {
+    describe('API', () => {
+        it('error token', done => {
             chai.request(this.app)
                 .get(`/?token=${API_TOKEN}1`)
                 .end((err, res) => {
@@ -301,7 +349,12 @@ describe('Microservice', function () {
                     assert.equal(res.body.events.posted, res.body.events.all);
                     assert.equal(res.body.events.ok, 0);
                     assert.equal(res.body.events.updated, 0);
-                    assert.equal(res.body.events.ok + res.body.events.posted + res.body.events.updated, res.body.events.all);
+                    assert.equal(
+                        res.body.events.ok +
+                            res.body.events.posted +
+                            res.body.events.updated,
+                        res.body.events.all,
+                    );
                     done(err);
                 });
         });
@@ -316,7 +369,12 @@ describe('Microservice', function () {
                     assert.equal(res.body.events.posted, 0);
                     assert.equal(res.body.events.updated, 0);
                     assert.equal(res.body.events.ok, res.body.events.all);
-                    assert.equal(res.body.events.ok + res.body.events.posted + res.body.events.updated, res.body.events.all);
+                    assert.equal(
+                        res.body.events.ok +
+                            res.body.events.posted +
+                            res.body.events.updated,
+                        res.body.events.all,
+                    );
                     done(err);
                 });
         });

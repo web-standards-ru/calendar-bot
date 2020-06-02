@@ -1,10 +1,8 @@
 import './config.mjs';
 
-import createServer from "./server.mjs";
+import createServer from './server.mjs';
 
-import {
-    openDb,
-} from "./db.mjs";
+import { openDb } from './db.mjs';
 
 async function createdDb() {
     const db = await openDb();
@@ -12,5 +10,4 @@ async function createdDb() {
     await db.close();
 }
 
-createdDb()
-.finally(createServer)
+createdDb().finally(createServer);

@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import WSEvent from "../types/wsevent.mjs";
+import WSEvent from '../types/wsevent.mjs';
 
 moment.locale('ru');
 
@@ -8,5 +8,7 @@ export default function (event) {
     if (!(event instanceof WSEvent)) {
         throw new TypeError(event);
     }
-    return `[${event.name}${event.isOnline ? ' (онлайн)' : ''}](${event.link})\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`;
+    return `[${event.name}${event.isOnline ? ' (онлайн)' : ''}](${
+        event.link
+    })\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`;
 }

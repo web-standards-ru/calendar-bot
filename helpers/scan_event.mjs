@@ -1,30 +1,27 @@
-import getEvents from "../helpers/get_events.mjs";
+import getEvents from '../helpers/get_events.mjs';
 
 import {
     openDb,
     getEvent,
     EventStatus,
     postEvent,
-    deleteEvent
-} from "../db.mjs";
+    deleteEvent,
+} from '../db.mjs';
 
-import mdEvent from "../helpers/md_event.mjs";
+import mdEvent from '../helpers/md_event.mjs';
 
-import {
-    sendMsg,
-    removeMsg
-} from "../helpers/telegram.mjs";
+import { sendMsg, removeMsg } from '../helpers/telegram.mjs';
 
-import WSEvent from "../types/wsevent.mjs";
+import WSEvent from '../types/wsevent.mjs';
 
 const ProcessEventStatus = {
     ok: 1,
     posted: 2,
-    updated: 3
+    updated: 3,
 };
 
 async function processEvent(fileName, event, db) {
-    if (typeof fileName != 'string' || !!!fileName) {
+    if (typeof fileName != 'string' || !fileName) {
         throw new TypeError(fileName);
     }
 
@@ -34,22 +31,18 @@ async function processEvent(fileName, event, db) {
 
     const markdown = mdEvent(event);
 
-    const {
-        action,
-        messageId
-    } = await getEvent(fileName, event, markdown, db);
+    const { action, messageId } = await getEvent(fileName, event, markdown, db);
 
     if (action == EventStatus.ok) {
         return ProcessEventStatus.ok;
     }
 
     if (action == EventStatus.notFound || action == EventStatus.needPost) {
-        const {
-            status,
-            body
-        } = await sendMsg(markdown);
+        const { status, body } = await sendMsg(markdown);
         if (status != 200) {
-            throw new Error(`Error send msg ${status} / ${JSON.stringify(body)}`);
+            throw new Error(
+                `Error send msg ${status} / ${JSON.stringify(body)}`,
+            );
         }
         await postEvent(fileName, event, markdown, body.result.message_id, db);
         return ProcessEventStatus.posted;
@@ -60,30 +53,34 @@ async function processEvent(fileName, event, db) {
         if (resRemove.status == 200) {
             await deleteEvent(fileName, event, markdown, messageId, db);
         } else {
-            console.warn(`Error remove msg ${messageId}: ${status} / ${JSON.stringify(body)}`);
+            console.warn(
+                `Error remove msg ${messageId}: ${status} / ${JSON.stringify(
+                    body,
+                )}`,
+            );
         }
 
-        const {
-            status,
-            body
-        } = await sendMsg(markdown);
+        const { status, body } = await sendMsg(markdown);
         if (status != 200) {
-            throw new Error(`Error send msg ${status} / ${JSON.stringify(body)}`);
+            throw new Error(
+                `Error send msg ${status} / ${JSON.stringify(body)}`,
+            );
         }
         await postEvent(fileName, event, markdown, body.result.message_id, db);
         return ProcessEventStatus.updated;
     }
 }
 
-
 export default async function () {
     const events = await getEvents();
 
     let posted = 0;
     let ok = 0;
-    let updated = 0
+    let updated = 0;
 
-    const fileNames = Object.keys(events).sort((e1, e2) => events[e1].start.valueOf() - events[e2].start.valueOf());
+    const fileNames = Object.keys(events).sort(
+        (e1, e2) => events[e1].start.valueOf() - events[e2].start.valueOf(),
+    );
 
     const db = await openDb();
 
@@ -112,7 +109,7 @@ export default async function () {
             all: fileNames.length,
             posted,
             ok,
-            updated
-        }
+            updated,
+        },
     };
 }

@@ -1,16 +1,12 @@
-import express from "express";
+import express from 'express';
 
-import scanEvent from "./helpers/scan_event.mjs";
+import scanEvent from './helpers/scan_event.mjs';
 
-const {
-    API_TOKEN,
-    PORT = 3000
-} = process.env;
+const { API_TOKEN, PORT = 3000 } = process.env;
 
-if (!!!API_TOKEN) {
+if (!API_TOKEN) {
     throw new Error('Not set env API_TOKEN');
 }
-
 
 export default function () {
     const app = express();
@@ -28,27 +24,28 @@ export default function () {
         }
 
         try {
-        res.json(await scanEvent());
-        }
-        catch(exc) {
+            res.json(await scanEvent());
+        } catch (exc) {
             next(exc);
         }
     });
 
-    app.use(function (req, res) {
+    app.use((req, res) => {
         console.warn('Page not found', req.url);
         return res.status(404).end('Page not found');
     });
 
-    app.use(function (err, req, res) {
+    app.use((err, _, res) => {
         console.error(err.stack);
         return res.status(500).end('Server error');
     });
 
     return {
         server: app.listen(PORT, () => {
-            console.log(`App started and available at http://localhost:${PORT}`);
+            console.log(
+                `App started and available at http://localhost:${PORT}`,
+            );
         }),
-        app: app
+        app,
     };
 }

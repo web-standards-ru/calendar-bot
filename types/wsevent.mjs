@@ -26,15 +26,17 @@ export default class WSEvent {
         this._isOnline = isOnline;
 
         if (this._finish <= this._start) {
-            throw new TypeError(`Finish ${this.finish} /  <= start ${this.start}`);
+            throw new TypeError(
+                `Finish ${this.finish} /  <= start ${this.start}`,
+            );
         }
 
-        if(!!!this._city && !this.isOnline) {
-            throw new TypeError(`Not set city`)
+        if (!this._city && !this.isOnline) {
+            throw new TypeError(`Not set city`);
         }
 
-        if(!!!this._link) {
-            throw new TypeError(`Not set link`)
+        if (!this._link) {
+            throw new TypeError(`Not set link`);
         }
     }
 
@@ -127,9 +129,29 @@ export default class WSEvent {
             timeSplit[1] = `${timeSecond[0]}${timeSecond[1]}`;
         }
 
-        const start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
-        const finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
+        const start = moment
+            .utc(
+                `${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''),
+                DATE_FORMAT,
+            )
+            .toDate();
+        const finish = moment
+            .utc(
+                `${dateSplit[1] || dateSplit[0]} ${
+                    timeSplit[1] || '2359'
+                }`.replace(/\D/g, ''),
+                DATE_FORMAT,
+            )
+            .utc()
+            .toDate();
 
-        return new WSEvent(yamlData.name, yamlData.city, yamlData.link || yamlData.url, start, finish, yamlData.online || false);
+        return new WSEvent(
+            yamlData.name,
+            yamlData.city,
+            yamlData.link || yamlData.url,
+            start,
+            finish,
+            yamlData.online || false,
+        );
     }
 }
