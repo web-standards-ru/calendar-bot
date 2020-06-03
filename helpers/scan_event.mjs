@@ -1,3 +1,4 @@
+import sqlite3 from 'sqlite3';
 import getEvents from '../helpers/get_events.mjs';
 
 import {
@@ -20,6 +21,14 @@ const ProcessEventStatus = {
     updated: 3,
 };
 
+/**
+ * Обработка события.
+ *
+ * @param {string} fileName - Относительный путь файла события в архиве.
+ * @param {WSEvent} event - Событие.
+ * @param {sqlite3.Database} db - Инстанс подключения к БД.
+ * @returns {ProcessEventStatus} - Статус обработки.
+ */
 async function processEvent(fileName, event, db) {
     if (typeof fileName != 'string' || !fileName) {
         throw new TypeError(fileName);
@@ -71,6 +80,11 @@ async function processEvent(fileName, event, db) {
     }
 }
 
+/**
+ * Получение и обработка событий.
+ *
+ * @returns {{ all: number, posted: number, ok: number, updated: number }} - Статистика обработки.
+ */
 export default async function () {
     const events = await getEvents();
 

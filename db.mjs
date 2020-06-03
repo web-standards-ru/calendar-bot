@@ -12,6 +12,12 @@ export const EventStatus = {
 
 const { DB_BAME = '/var/lib/calendar_bot.db' } = process.env;
 
+/**
+ * Создание подключения к БД.
+ *
+ * @param {string} filename - Путь к файлу БД.
+ * @returns {sqlite3.Database} - Созданный инстанс подключения к БД.
+ */
 export async function openDb(filename = DB_BAME) {
     return open({
         filename,
@@ -19,6 +25,15 @@ export async function openDb(filename = DB_BAME) {
     });
 }
 
+/**
+ * Поиск события в БД.
+ *
+ * @param {string} fileName - Относительный путь файла события в архиве.
+ * @param {WSEvent} event - Событие.
+ * @param {string} markdown - Markdown описание события.
+ * @param {?sqlite3.Database} db - Инстанс подключения к БД.
+ * @returns {{ action: EventStatus, messageId: ?number }} - Статус в БД и Id поста события.
+ */
 export async function getEvent(fileName, event, markdown, db = null) {
     if (typeof fileName != 'string' || !fileName) {
         throw new TypeError(fileName);
@@ -87,6 +102,15 @@ limit 1;
     };
 }
 
+/**
+ * Запись о посте события в БД, при отсутствии события в БД оно будет создано.
+ *
+ * @param {string} fileName - Относительный путь файла события в архиве.
+ * @param {WSEvent} event - Событие.
+ * @param {string} markdown - Markdown описание события.
+ * @param {number} messageId - Id поста события.
+ * @param {?sqlite3.Database} db - Инстанс подключения к БД.
+ */
 export async function postEvent(
     fileName,
     event,
@@ -172,6 +196,15 @@ values (
     }
 }
 
+/**
+ * Запись о удалении поста события в БД, при отсутствии события в БД - исключение.
+ *
+ * @param {string} fileName - Относительный путь файла события в архиве.
+ * @param {WSEvent} event - Событие.
+ * @param {string} markdown - Markdown описание события.
+ * @param {number} messageId - Id поста события.
+ * @param {?sqlite3.Database} db - Инстанс подключения к БД.
+ */
 export async function deleteEvent(
     fileName,
     event,

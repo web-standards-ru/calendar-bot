@@ -8,6 +8,11 @@ if (!API_TOKEN) {
     throw new Error('Not set env API_TOKEN');
 }
 
+/**
+ * Создание HTTP-сервера.
+ *
+ * @returns {{ server: express.server, app: express.Express}} - Созданный инстанс HTTP-сервера.
+ */
 export default function () {
     const app = express();
 

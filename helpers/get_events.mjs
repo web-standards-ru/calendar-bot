@@ -6,6 +6,11 @@ import WSEvent from '../types/wsevent.mjs';
 export const URL_EVENTS =
     'https://codeload.github.com/web-standards-ru/calendar/zip/master';
 
+/**
+ * Получени списка событий из master ветки репозитория web-standards-ru/calendar на github.
+ *
+ * @returns {{ filename: WSEvent }} - События.
+ */
 export default function () {
     return new Promise((resolve, reject) => {
         const eventFiles = {};

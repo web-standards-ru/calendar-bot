@@ -12,6 +12,12 @@ if (!CHANNEL) {
     throw new Error('Not set env CHANNEL');
 }
 
+/**
+ * HTTP запрос.
+ *
+ * @param {string} endpoint - URL.
+ * @returns {{ status: number, body: object|string, headers: object }} - Результат запроса.
+ */
 function request(endpoint) {
     return new Promise((resolve, reject) => {
         const opts = url.parse(endpoint);
@@ -41,6 +47,13 @@ function request(endpoint) {
     });
 }
 
+/**
+ * Отправка сообщения в telegram-канал.
+ *
+ * @param {string} markdown - Markdown описание события.
+ * @param {boolean} [disableWebPagePreview=true]  - Параметр disable_web_page_preview.
+ * @returns {{ status: number, body: object|string, headers: object }} - Результат запроса.
+ */
 async function send(markdown, disableWebPagePreview = true) {
     if (!(typeof markdown == 'string' && !!markdown)) {
         throw TypeError(`markdown ${markdown}`);
@@ -55,6 +68,12 @@ async function send(markdown, disableWebPagePreview = true) {
     );
 }
 
+/**
+ * Удаление сообщения из telegram-канала.
+ *
+ * @param {number} msgId - Id сообщения.
+ * @returns {{ status: number, body: object|string, headers: object }} - Результат запроса.
+ */
 async function remove(msgId) {
     if (typeof msgId !== 'number') {
         throw TypeError(`msgId ${msgId}`);
@@ -69,6 +88,12 @@ const sleep = delay => new Promise(resolve => setTimeout(resolve, delay));
 
 const MAX_RETRY = 100;
 
+/**
+ * Декортатор, гарантирующий повторный запрос при 429 ответе.
+ *
+ * @param {Function} fn - Функция обработки запроса.
+ * @returns {{ status: number, body: object|string, headers: object }} - Результат запроса.
+ */
 function retry(fn) {
     return async function () {
         for (let nTry = 0; nTry < MAX_RETRY; nTry++) {

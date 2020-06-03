@@ -4,18 +4,19 @@ import moment from 'moment';
 export const DATE_FORMAT = 'DDMMYYYYHHmm';
 
 /**
- * Класс, описывающий событие
+ * Класс, описывающий событие.
  */
 export default class WSEvent {
     /**
-     * Конструктор WSEvent
-     * @constructor
-     * @param {string} name название события
-     * @param {string} city город события
-     * @param {string} link url на сайт о событии
-     * @param {date} start начало события
-     * @param {date} finish окончание события
-     * @param {boolean} isOnline онлайн ли событие
+     * Конструктор WSEvent.
+     *
+     * @class
+     * @param {string} name - Название события.
+     * @param {string} city - Город события.
+     * @param {string} link - URL на сайт о событии.
+     * @param {Date} start  - Начало события.
+     * @param {Date} finish - Окончание события.
+     * @param {boolean} isOnline - Оонлайн ли событие.
      */
     constructor(name, city, link, start, finish, isOnline) {
         this._name = name;
@@ -41,58 +42,65 @@ export default class WSEvent {
     }
 
     /**
-     * Название события
-     * @returns {string} название события
+     * Название события.
+     *
+     * @returns {string} - Название события.
      */
     get name() {
         return this._name;
     }
 
     /**
-     * Город события
-     * @returns {string} город события
+     * Город события.
+     *
+     * @returns {string} - Город события.
      */
     get city() {
         return this._city;
     }
 
     /**
-     * Url на сайт о событии
-     * @returns {string} url на сайт о событии
+     * Url на сайт о событии.
+     *
+     * @returns {string} - URL на сайт о событии.
      */
     get link() {
         return this._link;
     }
 
     /**
-     * Начало события
-     * @returns {date} начало события
+     * Начало события.
+     *
+     * @returns {Date} - Начало события.
      */
     get start() {
         return this._start;
     }
 
     /**
-     * Окончание события
-     * @returns {date} окончание события
+     * Окончание события.
+     *
+     * @returns {Date} - Окончание события.
      */
     get finish() {
         return this._finish;
     }
 
     /**
-     * Онлайн ли событие
-     * @returns {boolean} онлайн ли событие
+     * Онлайн ли событие.
+     *
+     * @returns {boolean} - Онлайн ли событие.
      */
     get isOnline() {
         return this._isOnline;
     }
 
     /**
-     * Создание WSEvent из yaml-строки
+     * Создание WSEvent из yaml-строки.
+     *
      * @static
-     * @param {string} yaml yaml строка с событием
-     * @returns {WSEvent} новое событие
+     * @param {string} yaml - YAML-строка с событием.
+     * @returns {WSEvent} - новое событие.
      */
     static fromYaml(yaml) {
         const yamlData = YAML.parse(yaml);

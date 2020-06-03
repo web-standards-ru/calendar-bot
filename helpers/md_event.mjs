@@ -4,6 +4,12 @@ import WSEvent from '../types/wsevent.mjs';
 
 moment.locale('ru');
 
+/**
+ * Создание markdown описания события.
+ *
+ * @param {WSEvent} event - Событие.
+ * @returns {string} - Markdown описание события.
+ */
 export default function (event) {
     if (!(event instanceof WSEvent)) {
         throw new TypeError(event);
