@@ -1,0 +1,14 @@
+name: lint
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: lint
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: npm ci
+      - run: npm run lint
