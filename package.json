@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "mocha",
+    "microservice": "node microservice.mjs",
     "lint": "eslint --color helpers/*.mjs test/*.mjs types/*.mjs *.mjs",
     "prettier": "prettier helpers/*.mjs test/*.mjs types/*.mjs *.mjs --write"
   },
