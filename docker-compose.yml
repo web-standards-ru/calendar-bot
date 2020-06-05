@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  calendar-bot:
+    image: calendar-bot
+    build: .
+    environment:
+      - TOKEN=${TOKEN}
+      - CHANNEL=${CHANNEL}
+      - PROXY=socks://torproxy:9050
+      - API_TOKEN=${API_TOKEN}
+      - DB_BAME=/opt/app/calendar_bot.db
+    ports:
+      - 3000:3000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./calendar_bot.db:/opt/app/calendar_bot.db
+    restart: always
+    depends_on:
+      - torproxy
+
+  torproxy:
+    image: dperson/torproxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
