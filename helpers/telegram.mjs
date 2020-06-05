@@ -12,10 +12,9 @@ if (!CHANNEL) {
     throw new Error('Not set env CHANNEL');
 }
 
-if(PROXY) {
+if (PROXY) {
     console.log(`Proxy for requests: ${PROXY}`);
-}
-else {
+} else {
     console.log('Proxy not set');
 }
 
