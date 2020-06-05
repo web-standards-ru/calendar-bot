@@ -12,6 +12,13 @@ if (!CHANNEL) {
     throw new Error('Not set env CHANNEL');
 }
 
+if(PROXY) {
+    console.log(`Proxy for requests: ${PROXY}`);
+}
+else {
+    console.log('Proxy not set');
+}
+
 /**
  * HTTP запрос.
  *
@@ -22,9 +29,8 @@ function request(endpoint) {
     return new Promise((resolve, reject) => {
         const opts = url.parse(endpoint);
 
-        if (!PROXY) {
-            const agent = new SocksProxyAgent(PROXY);
-            opts.agent = agent;
+        if (PROXY) {
+            opts.agent = new SocksProxyAgent(PROXY);
         }
 
         https
