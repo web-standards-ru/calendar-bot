@@ -10,7 +10,7 @@ export const EventStatus = {
     needUpdate: 4,
 };
 
-const { DB_BAME = '/var/lib/calendar_bot.db' } = process.env;
+const { DB_NAME = '/var/lib/calendar_bot.db' } = process.env;
 
 /**
  * Создание подключения к БД.
@@ -18,7 +18,7 @@ const { DB_BAME = '/var/lib/calendar_bot.db' } = process.env;
  * @param {string} filename - Путь к файлу БД.
  * @returns {sqlite3.Database} - Созданный инстанс подключения к БД.
  */
-export async function openDb(filename = DB_BAME) {
+export async function openDb(filename = DB_NAME) {
     return open({
         filename,
         driver: sqlite3.Database,

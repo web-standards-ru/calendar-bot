@@ -9,12 +9,12 @@ services:
       - CHANNEL=${CHANNEL}
       - PROXY=socks://torproxy:9050
       - API_TOKEN=${API_TOKEN}
-      - DB_BAME=/opt/app/calendar_bot.db
+      - DB_NAME=/opt/app/db/calendar_bot.db
     ports:
       - 3000:3000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./calendar_bot.db:/opt/app/calendar_bot.db
+      - ./db:/opt/app/db
     restart: always
     depends_on:
       - torproxy
