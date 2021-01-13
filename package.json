@@ -1,13 +1,16 @@
 {
   "name": "@web-standards-ru/calendar-bot",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Module for post events from web-standards-ru/calendar",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "microservice": "node microservice.mjs",
+    "lint": "eslint --color helpers/*.mjs test/*.mjs types/*.mjs *.mjs",
+    "prettier": "prettier helpers/*.mjs test/*.mjs types/*.mjs *.mjs --write"
   },
   "repository": {
     "type": "git",
@@ -23,12 +26,24 @@
   },
   "homepage": "https://github.com/web-standards-ru/calendar-bot#readme",
   "devDependencies": {
-    "mocha": "^6.2.3",
-    "unzipper": "^0.10.11"
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "eslint": "^7.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-jsdoc": "^27.0.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "mocha": "^7.2.0",
+    "prettier": "^2.0.5",
+    "uuidv4": "^6.1.0"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "moment": "^2.24.0",
     "socks-proxy-agent": "^4.0.2",
+    "sqlite": "^4.0.9",
+    "sqlite3": "^4.2.0",
+    "unzipper": "^0.10.11",
     "yaml": "^1.9.2",
     "yargs": "^13.3.2"
   }
