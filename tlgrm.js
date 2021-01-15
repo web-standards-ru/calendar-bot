@@ -18,7 +18,7 @@ const WSEvent = require('./wsevent.js');
  * @param {string} [proxy='markdown'] parse_mode тип сообщения
  * @returns {Promise} результат http запроса {status: number, body: string}
  */
-const sendEvent = (event, token, channel, proxy=null, stringifyMsg=null, disable_web_page_preview=true, parse_mode='markdown') => {
+const sendEvent = (event, token, channel, proxy = null, stringifyMsg = null, disable_web_page_preview = true, parse_mode = 'markdown') => {
     return new Promise((resolve, reject) => {
         if (!(event instanceof WSEvent)) {
             return reject(TypeError('event must be WSEvent'))
@@ -35,7 +35,7 @@ const sendEvent = (event, token, channel, proxy=null, stringifyMsg=null, disable
         moment.locale('ru');
         const msg = encodeURIComponent(typeof stringifyMsg == 'function' ?
             stringifyMsg(event) :
-            `[${event.name}](${event.link})\n${event.city}, ${moment(event.start).utc().format('D MMMM YYYY')}`);
+            `[${event.name}${event.isOnline ? ' (онлайн)' : ''}](${event.link})\n${event.city}, ${moment(event.start).utc().format('DD MMMM YYYY')}`);
         const endpoint = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${channel}&text=${msg}&parse_mode=${parse_mode}&disable_web_page_preview=${disable_web_page_preview ? 'True' : 'False'}`;
         const opts = url.parse(endpoint);
 

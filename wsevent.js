@@ -17,15 +17,17 @@ class WSEvent {
      * @param {string} link url на сайт о событии
      * @param {date} start начало события
      * @param {date} finish окончание события
+     * @param {boolean} isOnline онлайн ли событие
      */
-    constructor(name, city, link, start, finish) {
+    constructor(name, city, link, start, finish, isOnline) {
         this._name = name;
         this._city = city;
         this._link = link;
         this._start = start;
         this._finish = finish;
+        this._isOnline = isOnline;
 
-        if(this._finish <= this._start) {
+        if (this._finish <= this._start) {
             throw new Error('Finish <= start');
         }
     }
@@ -71,54 +73,58 @@ class WSEvent {
     }
 
     /**
+     * Онлайн ли событие
+     * @returns {boolean} онлайн ли событие
+     */
+    get isOnline() {
+        return this._isOnline;
+    }
+
+    /**
      * Создание WSEvent из yaml-строки
      * @static
      * @param {string} yaml yaml строка с событием
      * @returns {WSEvent} новое событие
      */
     static fromYaml(yaml) {
-        const yaml_data = YAML.parse(yaml);
-        
-        const dateSplit = yaml_data.date.split('-');
-        const timeSplit = (yaml_data.time || '00:00 23:59').split(/[ -]/);
+        const yamlData = YAML.parse(yaml);
+
+        const dateSplit = yamlData.date.split('-');
+        const timeSplit = (yamlData.time || '00:00 23:59').split(/[ -]/);
         const timeFirst = timeSplit[0].split(':');
-        if(timeFirst.length == 2) {
-            if(timeFirst[0].length < 2) {
+        if (timeFirst.length == 2) {
+            if (timeFirst[0].length < 2) {
                 timeFirst[0] = `0${timeFirst[0]}`;
-            }
-            else if(timeFirst[0].length > 2) {
+            } else if (timeFirst[0].length > 2) {
                 timeFirst[0] = '00';
             }
-            if(timeFirst[1].length < 2) {
+            if (timeFirst[1].length < 2) {
                 timeFirst[1] = `0${timeFirst[0]}`;
-            }
-            else if(timeFirst[1].length > 2) {
+            } else if (timeFirst[1].length > 2) {
                 timeFirst[1] = '00';
-            } 
+            }
             timeSplit[0] = `${timeFirst[0]}${timeFirst[1]}`;
         }
 
         const timeSecond = timeSplit[0].split(':');
-        if(timeSecond.length == 2) {
-            if(timeSecond[0].length < 2) {
+        if (timeSecond.length == 2) {
+            if (timeSecond[0].length < 2) {
                 timeSecond[0] = `0${timeSecond[0]}`;
-            }
-            else if(timeSecond[0].length > 2) {
+            } else if (timeSecond[0].length > 2) {
                 timeSecond[0] = '23';
             }
-            if(timeSecond[1].length < 2) {
+            if (timeSecond[1].length < 2) {
                 timeSecond[1] = `0${timeSecond[0]}`;
-            }
-            else if(timeSecond[1].length > 2) {
+            } else if (timeSecond[1].length > 2) {
                 timeSecond[1] = '59';
-            } 
+            }
             timeSplit[1] = `${timeSecond[0]}${timeSecond[1]}`;
         }
 
         const start = moment.utc(`${dateSplit[0]} ${timeSplit[0] || '0000'}`.replace(/\D/g, ''), DATE_FORMAT).toDate();
         const finish = moment.utc(`${dateSplit[1] || dateSplit[0]} ${timeSplit[1] || '2359'}`.replace(/\D/g, ''), DATE_FORMAT).utc().toDate();
 
-        return new WSEvent(yaml_data.name, yaml_data.city, yaml_data.link, start, finish);
+        return new WSEvent(yamlData.name, yamlData.city, yamlData.link, start, finish, yamlData.online || false);
     }
 
 }
